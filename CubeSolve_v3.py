@@ -222,12 +222,77 @@ def writeColor(face, order):
 
 
 face_idx = 0
+import twophase.solver  as sv
 
-manipulateCube('R')
-hw.delay(100)
-manipulateCube('U')    
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        print("Can't receive frame (stream end?). Exiting ...")
+        break
+
+    c = cv.waitKey(1)
+    if c == ord('q'):
+        cap.release()
+        cv.destroyAllWindows()
+        hw.releasePins()
+        exit()
+    elif c == ord('s'):
+        #for idx in range(9):
+            #cube_color[face_idx][idx] = face_color[idx]
+        writeColor(cube_color[face_idx], writeOrder[face_idx])
+        Color2Pos[face_color[4]] = order[face_idx]
+        print(cube_color)
+        print(Color2Pos)
+        face_idx += 1
+        if face_idx == 6:
+            break
+        manipulateCube(order[face_idx - 3])
+    
+    for i in range(3):
+        for j in range(3):
+            ptLT_Temp = (ptLT[0] + 170*j, ptLT[1] + 170*i)
+            ptRB_Temp = (ptLT_Temp[0]+90,ptLT_Temp[1]+90)
+            a = [0, 0, 0]
+            for channel in range(3):
+                a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + 90, ptLT_Temp[0] + 1: ptLT_Temp[0] + 90, channel])
+
+            (H,S,V) = colorsys.rgb_to_hsv(a[2]/ 255, a[1]/ 255, a[0]/ 255)
+            (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
+            HSV = {'H': H, 'S': S, 'V': V}
+            color = knn(HSV)
+            if HSV['S'] < 20:
+                color = 'white'
+            
+            face_color[i * 3 + j] = color
+            cv.rectangle(frame, ptLT_Temp, ptRB_Temp, LineColour[color], 2)
+
+    cv.imshow('frame', frame)
+
+output = ""
+for i in range(6):
+    for j in range(9):
+        output+=Color2Pos[cube_color[i][j]]
+
+print(output)
+
+result = sv.solve(output,0,2)
+print(result)
+
+movs = []
+i = 0
+while i < len(result)-5:
+    c = ""
+    if result[i] != ' ':
+        c += result[i]
+        c += result[i+1]
+        movs.append(c)
+    i = i+3
+
+for mov in movs:
+    print(mov)
+    manipulateCube(mov)
+    
 hw.releasePins()
 cap.release()
 cv.destroyAllWindows()
-
 

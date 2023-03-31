@@ -9,17 +9,22 @@
 
 #define servo_pin 26
 
-#define period 900
+#define period 850
 
 #define MOTOR_STEPS 200
 
 #define resolution 2
 
 void flip_cube(void){
-	pwmWrite(servo_pin, 35);
-	delay(300);
+	pwmWrite(servo_pin, 36);
+	delay(200);
+	for(int i = 35; i > 21; i-=2){
+		pwmWrite(servo_pin, i);
+		delay(50);
+	}
 	pwmWrite(servo_pin, 21);
-	delay(500);
+	delay(50);
+	delay(200);
 }
 
 void pwmsetup(void){
@@ -27,6 +32,7 @@ void pwmsetup(void){
 	pwmSetMode(PWM_MODE_MS);
 	pwmSetRange(720);
 	pwmSetClock(1500);
+	pwmWrite(servo_pin, 21);
 }
 
 void rotate(int angle, int anti){
@@ -54,17 +60,18 @@ void releasePins(){
 	pinMode(servo_pin, INPUT);
 }
 
+
 int main(void){
 	wiringPiSetup();
 	motorsetup();
 	pwmsetup();
+	delay(1000);
+	rotate(90, HIGH);
 	delay(100);
-	rotate(180, 1);
-	delay(500);
 	flip_cube();
-	delay(500);
-	rotate(360, 0);
-	delay(50);
+	delay(100);
+	//rotate(90, LOW);
+	//delay(100);
 	releasePins();
 	return 0;
 }
