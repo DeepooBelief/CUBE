@@ -1,1 +1,6 @@
 twophase
+/twophase
+*.exe
+*.o
+*.dll
+
