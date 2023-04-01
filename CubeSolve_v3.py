@@ -22,7 +22,7 @@ Color2Pos = {'orange': 'L', 'blue': 'F', 'green': 'B', 'red': 'R', 'yellow': 'U'
 face_color = [0]*9
 order = 'URFDLB'#'UFRBLD'
 
-cube_pos = ["U", "D", "F", "B", "L", "R"]
+cube_pos = ["B", "F", "U", "D", "L", "R"]
 writeOrder = ['123456789', '123456789', '123456789', '123456789', '123456789', '741852963']
 hw = CDLL('./motorservo.dll') #use the dll to control stepper motor and servo
 hw.wiringPiSetup() #used to setup pins
@@ -136,7 +136,6 @@ def knn(data):
 def movement_y(a):
     print("y rotate")
     hw.rotate(90, True)
-    hw.delay(200)
     a[2], a[5] = a[5], a[2]
     a[3], a[4] = a[4], a[3]
     a[4], a[5] = a[5], a[4]
@@ -145,7 +144,6 @@ def movement_y(a):
 def movement_y_ivt(a):
     print("y_ivt rotate")
     hw.rotate(90, False)
-    hw.delay(200)
     a[2], a[4] = a[4], a[2]
     a[3], a[4] = a[4], a[3]
     a[3], a[5] = a[5], a[3]
@@ -154,22 +152,9 @@ def movement_y_ivt(a):
 def movement_x(a):
     print("x rotate")
     hw.flip_cube()
-    hw.delay(200)
+    hw.delay(100)
     a[0], a[2] = a[2], a[0]
     a[1], a[2] = a[2], a[1]
-    a[1], a[3] = a[3], a[1]
-
-
-def movement_x_ivt(a):
-    print("x_ivt rotate")
-    hw.flip_cube()
-    hw.delay(50)
-    hw.flip_cube()
-    hw.delay(50)
-    hw.flip_cube()
-    hw.delay(200)
-    a[0], a[3] = a[3], a[0]
-    a[3], a[2] = a[2], a[3]
     a[1], a[3] = a[3], a[1]
 
 
@@ -179,7 +164,10 @@ def to_U(a):
 
 
 def to_F(a):
-    movement_x_ivt(a)
+    movement_y(a)
+    movement_y(a)
+    hw.delay(100)
+    movement_x(a)
 
 
 def to_B(a):
@@ -187,13 +175,15 @@ def to_B(a):
 
 
 def to_L(a):
-    movement_y_ivt(a)
-    movement_x_ivt(a)
+    movement_y(a)
+    movement_x(a)
+    hw.delay(100)
 
 
 def to_R(a):
-    movement_y(a)
-    movement_x_ivt(a)
+    movement_y_ivt(a)
+    hw.delay(100)
+    movement_x(a)
 
 
 def to_D(a):

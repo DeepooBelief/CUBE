@@ -9,20 +9,23 @@
 
 #define servo_pin 26
 
-#define period 850
+#define period 1600
 
 #define MOTOR_STEPS 200
 
-#define resolution 2
+#define resolution 1
 
 void flip_cube(void){
-	pwmWrite(servo_pin, 36);
-	delay(200);
+	for(int i = 20; i < 38; i+=2){
+		pwmWrite(servo_pin, i);
+		delay(10);
+	}
+	delay(300);
 	for(int i = 35; i > 21; i-=2){
 		pwmWrite(servo_pin, i);
 		delay(50);
 	}
-	pwmWrite(servo_pin, 21);
+	pwmWrite(servo_pin, 20);
 	delay(50);
 	delay(200);
 }
