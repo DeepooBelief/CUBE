@@ -20,10 +20,10 @@ cube_color = [[0]*9 for i in range(6)]
 Color2Pos = {'orange': 'L', 'blue': 'F', 'green': 'B', 'red': 'R', 'yellow': 'U', 'white': 'D'}
 
 face_color = [0]*9
-order = 'URFDLB'
+order = 'URFDLB'#'UFRBLD'
 
 cube_pos = ["U", "D", "F", "B", "L", "R"]
-writeOrder = ['123456789', '987654321', '741852963', '987654321', '123456789', '741852963']
+writeOrder = ['123456789', '123456789', '123456789', '123456789', '123456789', '741852963']
 hw = CDLL('./motorservo.dll') #use the dll to control stepper motor and servo
 hw.wiringPiSetup() #used to setup pins
 hw.motorsetup() #used to setup stepper motor
@@ -237,16 +237,22 @@ while True:
         hw.releasePins()
         exit()
     elif c == ord('s'):
+        SCAN_ORDER = "UFRBLD"
         #for idx in range(9):
             #cube_color[face_idx][idx] = face_color[idx]
-        writeColor(cube_color[face_idx], writeOrder[face_idx])
-        Color2Pos[face_color[4]] = order[face_idx]
+        writeColor(cube_color[order.find(SCAN_ORDER[face_idx])], writeOrder[face_idx])
+        Color2Pos[face_color[4]] = SCAN_ORDER[face_idx]
         print(cube_color)
         print(Color2Pos)
-        face_idx += 1
-        if face_idx == 6:
+        if face_idx == 5:
             break
-        manipulateCube(order[face_idx - 3])
+        if face_idx == 0 or face_idx == 4:
+            movement_x(cube_pos)
+        else:
+            movement_y(cube_pos)
+        face_idx += 1
+        
+        #manipulateCube(order[face_idx - 3])
     
     for i in range(3):
         for j in range(3):
