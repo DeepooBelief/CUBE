@@ -15,6 +15,8 @@
 
 #define resolution 1
 
+#define e 2.71828;
+
 void flip_cube(void){
 	for(int i = 20; i < 38; i+=2){
 		pwmWrite(servo_pin, i);
@@ -38,14 +40,20 @@ void pwmsetup(void){
 	pwmWrite(servo_pin, 21);
 }
 
-void rotate(int angle, int anti){
+void rotate(int angle, int anti,int period_){
 	digitalWrite(dir_pin, anti);
 	for(int i = 0; i < angle * MOTOR_STEPS * resolution / 360; i++){
 		digitalWrite(step_pin, HIGH);
-		delayMicroseconds(period);
+		delayMicroseconds(period_);
 		digitalWrite(step_pin, LOW);
-		delayMicroseconds(period);
+		delayMicroseconds(period_);
 	}
+}
+
+int period_determine(void)
+{
+	int period_ = e ^ (-0.02 * period);
+	return period_;
 }
 
 void motorsetup(){
