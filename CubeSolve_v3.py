@@ -185,8 +185,8 @@ def to_B(a):
 
 def to_L(a):
     movement_y(a)
-    movement_x(a)
     hw.delay(100)
+    movement_x(a)
 
 
 def to_R(a):
