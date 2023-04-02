@@ -103,13 +103,13 @@ except (FileNotFoundError):
                     for channel in range(3):
                         a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + Length, ptLT_Temp[0] + 1: ptLT_Temp[0] + Length, channel])
 
-                (H,S,V) = colorsys.rgb_to_hsv(a[2]/ 255, a[1]/ 255, a[0]/ 255)
-                (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
-                row = [col, H, S, V]
-                print('H s v:', H,S,V)
-                with open('color.csv', 'a', encoding='utf-8', newline='') as f:
-                    writer = csv.writer(f)
-                    writer.writerow(row)
+                    (H,S,V) = colorsys.rgb_to_hsv(a[2]/ 255, a[1]/ 255, a[0]/ 255)
+                    (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
+                    row = [col, H, S, V]
+                    print('H s v:', H,S,V)
+                    with open('color.csv', 'a', encoding='utf-8', newline='') as f:
+                        writer = csv.writer(f)
+                        writer.writerow(row)
 
             f.close()
         elif c == ord('w'):
