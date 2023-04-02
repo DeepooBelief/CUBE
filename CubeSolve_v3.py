@@ -118,7 +118,7 @@ except (FileNotFoundError):
             movement_x(cube_pos)
         elif c == ord('a'):
             movement_y(cube_pos)
-        elif c == ord('s'):
+        elif c == ord('d'):
             movement_y_ivt(cube_pos)
 
     hw.releasePins()
