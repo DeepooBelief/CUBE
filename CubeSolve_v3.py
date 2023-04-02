@@ -18,6 +18,8 @@ ptLT = (50,40)
 LineColour = {'red': (0,0,255), 'orange': (0, 127, 255), 'yellow': (0, 255, 255), 'green': (0, 255, 0), 'blue': (255, 0, 0), 'white': (255, 255, 255)}
 cube_color = [[0]*9 for i in range(6)]
 Color2Pos = {'orange': 'L', 'blue': 'F', 'green': 'B', 'red': 'R', 'yellow': 'U', 'white': 'D'}
+Seperation = 170 #摄像头正方形的间距
+Length = 90 #摄像头正方形的边长
 
 face_color = [0]*9
 order = 'URFDLB'#'UFRBLD'
@@ -33,8 +35,8 @@ hw.pwmsetup() #used to setup servo
 def drawBlocks(picture, color):
     for i in range(3):
         for j in range(3):
-            ptLT_Temp = (ptLT[0] + 170*j, ptLT[1] + 170*i)
-            ptRB_Temp = (ptLT_Temp[0]+90,ptLT_Temp[1]+90)
+            ptLT_Temp = (ptLT[0] + Seperation*j, ptLT[1] + Seperation*i)
+            ptRB_Temp = (ptLT_Temp[0]+Length,ptLT_Temp[1]+Length)
             cv.rectangle(picture, ptLT_Temp, ptRB_Temp, color, 1)
 
 try:
@@ -71,11 +73,11 @@ except (FileNotFoundError):
             col = input()
             for i in range(3):
                 for j in range(3):
-                    ptLT_Temp = (ptLT[0] + 170*j, ptLT[1] + 170*i)
-                    ptRB_Temp = (ptLT_Temp[0]+90,ptLT_Temp[1]+90)
+                    ptLT_Temp = (ptLT[0] + Seperation*j, ptLT[1] + Seperation*i)
+                    ptRB_Temp = (ptLT_Temp[0]+Length,ptLT_Temp[1]+Length)
                     a = [0, 0, 0]
                     for channel in range(3):
-                        a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + 90, ptLT_Temp[0] + 1: ptLT_Temp[0] + 90, channel])
+                        a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + Length, ptLT_Temp[0] + 1: ptLT_Temp[0] + Length, channel])
                     b.append(a)
 
             for i in range(9):
@@ -246,11 +248,11 @@ while True:
     
     for i in range(3):
         for j in range(3):
-            ptLT_Temp = (ptLT[0] + 170*j, ptLT[1] + 170*i)
-            ptRB_Temp = (ptLT_Temp[0]+90,ptLT_Temp[1]+90)
+            ptLT_Temp = (ptLT[0] + Seperation*j, ptLT[1] + Seperation*i)
+            ptRB_Temp = (ptLT_Temp[0]+Length,ptLT_Temp[1]+Length)
             a = [0, 0, 0]
             for channel in range(3):
-                a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + 90, ptLT_Temp[0] + 1: ptLT_Temp[0] + 90, channel])
+                a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + Length, ptLT_Temp[0] + 1: ptLT_Temp[0] + Length, channel])
 
             (H,S,V) = colorsys.rgb_to_hsv(a[2]/ 255, a[1]/ 255, a[0]/ 255)
             (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
