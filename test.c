@@ -9,7 +9,7 @@
 
 #define servo_pin 26
 
-#define period 2000
+#define period 1600
 
 #define MOTOR_STEPS 200
 
@@ -40,15 +40,11 @@ void pwmsetup(void){
 
 void rotate(int angle, int anti){
 	digitalWrite(dir_pin, anti);
-	int start_period = 4000;
 	for(int i = 0; i < angle * MOTOR_STEPS * resolution / 360; i++){
-		//printf("%d\n", start_period);
 		digitalWrite(step_pin, HIGH);
-		delayMicroseconds(start_period);
+		delayMicroseconds(period);
 		digitalWrite(step_pin, LOW);
-		delayMicroseconds(start_period);
-		if(start_period > period)
-			start_period -= 100;
+		delayMicroseconds(period);
 	}
 }
 
@@ -72,8 +68,8 @@ int main(void){
 	wiringPiSetup();
 	motorsetup();
 	pwmsetup();
-	delay(2000);
-	rotate(3600, HIGH);
+	delay(1000);
+	rotate(90, HIGH);
 	delay(100);
 	flip_cube();
 	delay(100);
