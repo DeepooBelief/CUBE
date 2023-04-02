@@ -115,11 +115,11 @@ except (FileNotFoundError):
 
             f.close()
         elif c == ord('w'):
-            movement_x()
+            movement_x(cube_pos)
         elif c == ord('a'):
-            movement_y()
+            movement_y(cube_pos)
         elif c == ord('s'):
-            movement_y_ivt()
+            movement_y_ivt(cube_pos)
 
     hw.releasePins()
     cap.release()
