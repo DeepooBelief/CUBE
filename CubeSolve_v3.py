@@ -102,10 +102,8 @@ except (FileNotFoundError):
                     a = [0, 0, 0]
                     for channel in range(3):
                         a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + Length, ptLT_Temp[0] + 1: ptLT_Temp[0] + Length, channel])
-                    b.append(a)
 
-            for i in range(9): # calculate the 9 blocks' HSV 
-                (H,S,V) = colorsys.rgb_to_hsv(b[-1-i][2]/ 255, b[-1-i][1]/ 255, b[-1-i][0]/ 255)
+                (H,S,V) = colorsys.rgb_to_hsv(a[2]/ 255, a[1]/ 255, a[0]/ 255)
                 (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
                 row = [col, H, S, V]
                 print('H s v:', H,S,V)
