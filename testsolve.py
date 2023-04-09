@@ -19,12 +19,11 @@ def Init():
     cap.set(3, 640)
     cap.set(4, 480)
     
-    global ptLT,face_color,p,face_idx
+    global ptLT,face_color,p
     global LineColour,cube_color,Color2Pos,order,cube_pos,writeOrder
     ptLT = (50,40)
     face_color = [0]*9
     p = [to_U, to_D, to_F, to_B, to_L, to_R]
-    face_idx = 0
     LineColour = {'red': (0,0,255), 'orange': (0, 127, 255), 
                   'yellow': (0, 255, 255), 'green': (0, 255, 0), 'blue': (255, 0, 0),
                     'white': (255, 255, 255)}
@@ -76,10 +75,11 @@ def movement_x(a):
     a[1], a[2] = a[2], a[1]
     a[1], a[3] = a[3], a[1]
 
-def GenerateCsv(ret,frame):
-    """@param: ret,frame = cap.read() 来自摄像头
+def GenerateCsv():
+    """@param: none
        @purpo: 生成一个csv文件用于knn算法的数据集"""
     while True:
+        ret, frame = cap.read()
         if not ret:
             print("Can't receive frame (stream end?). Exiting ...")
             hw.releasePins()
@@ -137,8 +137,7 @@ def CheckCsv():
             writer.writerow(headers)
 
         f.close()
-        ret, frame = cap.read()
-        GenerateCsv(ret,frame)
+        GenerateCsv()
         hw.releasePins()
         cap.release()
         cv.destroyAllWindows()
@@ -231,6 +230,7 @@ def writeColor(face, order):
 def ColorScanning():
     """@param: no parameter
        @purpo: to scan the cube and generate the corresponding string"""
+    face_idx = 0
     while True:
         ret, frame = cap.read()
         if not ret:
