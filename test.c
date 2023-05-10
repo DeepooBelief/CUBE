@@ -9,24 +9,28 @@
 
 #define servo_pin 26
 
-#define period 1600
+#define period 1400
 
 #define MOTOR_STEPS 200
 
 #define resolution 1
 
+#define released_angle 38
+
+#define locked_angle 28
+
 void flip_cube(void){
-	for(int i = 20; i < 38; i+=2){
+	for(int i = 38; i < 60; i+=2){
+		pwmWrite(servo_pin, i);
+		delay(8);
+	}
+	delay(300);
+	for(int i = 60; i > 38; i-=2){
 		pwmWrite(servo_pin, i);
 		delay(10);
 	}
-	delay(300);
-	for(int i = 35; i > 21; i-=2){
-		pwmWrite(servo_pin, i);
-		delay(50);
-	}
-	pwmWrite(servo_pin, 20);
-	delay(50);
+	//pwmWrite(servo_pin, 40);
+	//delay(50);
 	delay(200);
 }
 
@@ -35,8 +39,24 @@ void pwmsetup(void){
 	pwmSetMode(PWM_MODE_MS);
 	pwmSetRange(720);
 	pwmSetClock(1500);
-	pwmWrite(servo_pin, 21);
+	pwmWrite(servo_pin, released_angle);
 }
+
+void lock(){
+	pwmWrite(servo_pin, locked_angle);
+	delay(500);
+}
+
+void unlock(){
+	pwmWrite(servo_pin, released_angle);
+	delay(500);
+}
+
+void cam_pos(){
+	pwmWrite(servo_pin, 31);
+	delay(500);
+}
+
 
 void rotate(int angle, int anti){
 	digitalWrite(dir_pin, anti);
@@ -66,12 +86,17 @@ void releasePins(){
 
 int main(void){
 	wiringPiSetup();
-	motorsetup();
+	//motorsetup();
 	pwmsetup();
 	delay(1000);
-	rotate(90, HIGH);
-	delay(100);
-	flip_cube();
+	cam_pos();
+	//lock();
+	//rotate(90, HIGH);
+	//delay(100);
+	//for(int i = 0; i < 10; i++)
+	//flip_cube();
+	//delay(1000);
+	//unlock();
 	delay(100);
 	//rotate(90, LOW);
 	//delay(100);

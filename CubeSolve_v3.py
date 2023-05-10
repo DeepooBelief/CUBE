@@ -14,12 +14,12 @@ if not cap.isOpened():
 cap.set(3, 640)
 cap.set(4, 480)
 
-ptLT = (50,40)
+ptLT = (85,20)
 LineColour = {'red': (0,0,255), 'orange': (0, 127, 255), 'yellow': (0, 255, 255), 'green': (0, 255, 0), 'blue': (255, 0, 0), 'white': (255, 255, 255)}
 cube_color = [[0]*9 for i in range(6)]
 Color2Pos = {'orange': 'L', 'blue': 'F', 'green': 'B', 'red': 'R', 'yellow': 'U', 'white': 'D'}
-Seperation = 170 #摄像头正方形的间距
-Length = 90 #摄像头正方形的边长
+Seperation = 172 #摄像头正方形的间距
+Length = 80 #摄像头正方形的边长
 
 face_color = [0]*9
 order = 'URFDLB'#'UFRBLD'
@@ -204,14 +204,12 @@ def manipulateCube(res):
             p[cube_pos.index(c)](cube_pos)
         elif c.isdigit():
             i = int(c)
-            print("Lock")
-            input()
+            hw.lock()
             if i == 3:
                 hw.rotate(90, True);
             else:
                 hw.rotate(90*int(c), False);
-            print('Unlock')
-            input()
+            hw.unlock()
             
 def writeColor(face, order):
     for i, c in enumerate(order):
@@ -221,81 +219,110 @@ def writeColor(face, order):
 face_idx = 0
 import twophase.solver  as sv
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        print("Can't receive frame (stream end?). Exiting ...")
-        break
 
-    c = cv.waitKey(1)
-    if c == ord('q'):
-        cap.release()
-        cv.destroyAllWindows()
-        hw.releasePins()
-        exit()
-    elif c == ord('s'):
-        SCAN_ORDER = "UFRBLD"
-        #for idx in range(9):
-            #cube_color[face_idx][idx] = face_color[idx]
-        writeColor(cube_color[order.find(SCAN_ORDER[face_idx])], writeOrder[face_idx])
-        Color2Pos[face_color[4]] = SCAN_ORDER[face_idx]
-        print(cube_color)
-        print(Color2Pos)
-        if face_idx == 5:
+def my_function():
+    global face_color, face_idx
+    hw.cam_pos()
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("Can't receive frame (stream end?). Exiting ...")
             break
-        if face_idx == 0 or face_idx == 4:
-            movement_x(cube_pos)
-        else:
-            movement_y(cube_pos)
-        face_idx += 1
-        
-        #manipulateCube(order[face_idx - 3])
-    
-    for i in range(3):
-        for j in range(3):
-            ptLT_Temp = (ptLT[0] + Seperation*j, ptLT[1] + Seperation*i)
-            ptRB_Temp = (ptLT_Temp[0]+Length,ptLT_Temp[1]+Length)
-            a = [0, 0, 0]
-            for channel in range(3):
-                a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + Length, ptLT_Temp[0] + 1: ptLT_Temp[0] + Length, channel])
 
-            (H,S,V) = colorsys.rgb_to_hsv(a[2]/ 255, a[1]/ 255, a[0]/ 255)
-            (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
-            HSV = {'H': H, 'S': S, 'V': V}
-            color = knn(HSV)
-            if HSV['S'] < 20:
-                color = 'white'
+        c = cv.waitKey(1)
+        if c == ord('q'):
+            cap.release()
+            cv.destroyAllWindows()
+            hw.releasePins()
+            exit()
+        elif c == ord('s'):
             
-            face_color[i * 3 + j] = color
-            cv.rectangle(frame, ptLT_Temp, ptRB_Temp, LineColour[color], 2)
+            ret, frame = cap.read()
+            for i in range(3):
+                for j in range(3):
+                    ptLT_Temp = (ptLT[0] + Seperation*j, ptLT[1] + Seperation*i)
+                    ptRB_Temp = (ptLT_Temp[0]+Length,ptLT_Temp[1]+Length)
+                    a = [0, 0, 0]
+                    for channel in range(3):
+                        a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + Length, ptLT_Temp[0] + 1: ptLT_Temp[0] + Length, channel])
 
-    cv.imshow('frame', frame)
-
-output = ""
-for i in range(6):
-    for j in range(9):
-        output+=Color2Pos[cube_color[i][j]]
-
-print(output)
-
-result = sv.solve(output,0,2)
-print(result)
-
-movs = []
-i = 0
-while i < len(result)-5:
-    c = ""
-    if result[i] != ' ':
-        c += result[i]
-        c += result[i+1]
-        movs.append(c)
-    i = i+3
-
-for mov in movs:
-    print(mov)
-    manipulateCube(mov)
+                    (H,S,V) = colorsys.rgb_to_hsv(a[2]/ 255, a[1]/ 255, a[0]/ 255)
+                    (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
+                    HSV = {'H': H, 'S': S, 'V': V}
+                    color = knn(HSV)
+                    if HSV['S'] < 20:
+                        color = 'white'
+                    
+                    face_color[i * 3 + j] = color
+                    cv.rectangle(frame, ptLT_Temp, ptRB_Temp, LineColour[color], 2)
+            SCAN_ORDER = "UFRBLD"
+            #for idx in range(9):
+                #cube_color[face_idx][idx] = face_color[idx]
+            writeColor(cube_color[order.find(SCAN_ORDER[face_idx])], writeOrder[face_idx])
+            Color2Pos[face_color[4]] = SCAN_ORDER[face_idx]
+            print(cube_color)
+            print(Color2Pos)
+            #input()
+            hw.unlock()
+            print("unlock")
+            if face_idx == 5:
+                break
+            if face_idx == 0 or face_idx == 4:
+                movement_x(cube_pos)
+            else:
+                movement_y(cube_pos)
+            face_idx += 1
+            hw.cam_pos()
+            print("cam pos")
+            cv.imshow('frame', frame)
+            #manipulateCube(order[face_idx - 3])
     
-hw.releasePins()
-cap.release()
-cv.destroyAllWindows()
+        for i in range(3):
+            for j in range(3):
+                ptLT_Temp = (ptLT[0] + Seperation*j, ptLT[1] + Seperation*i)
+                ptRB_Temp = (ptLT_Temp[0]+Length,ptLT_Temp[1]+Length)
+                a = [0, 0, 0]
+                for channel in range(3):
+                    a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + Length, ptLT_Temp[0] + 1: ptLT_Temp[0] + Length, channel])
 
+                (H,S,V) = colorsys.rgb_to_hsv(a[2]/ 255, a[1]/ 255, a[0]/ 255)
+                (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
+                HSV = {'H': H, 'S': S, 'V': V}
+                color = knn(HSV)
+                if HSV['S'] < 20:
+                    color = 'white'
+                
+                face_color[i * 3 + j] = color
+                cv.rectangle(frame, ptLT_Temp, ptRB_Temp, LineColour[color], 2)
+
+        cv.imshow('frame', frame)
+
+    output = ""
+    for i in range(6):
+        for j in range(9):
+            output+=Color2Pos[cube_color[i][j]]
+
+    print(output)
+
+    result = sv.solve(output,0,2)
+    print(result)
+
+    movs = []
+    i = 0
+    while i < len(result)-5:
+        c = ""
+        if result[i] != ' ':
+            c += result[i]
+            c += result[i+1]
+            movs.append(c)
+        i = i+3
+
+    for mov in movs:
+        print(mov)
+        manipulateCube(mov)
+        
+    hw.releasePins()
+    cap.release()
+    cv.destroyAllWindows()
+
+my_function()
