@@ -17,21 +17,51 @@
 
 #define released_angle 38
 
-#define locked_angle 28
+#define locked_angle 27
+void lock();
+void unlock();
+void cam_pos();
 
 void flip_cube(void){
-	for(int i = 38; i < 60; i+=2){
-		pwmWrite(servo_pin, i);
-		delay(8);
-	}
+	//for(int i = 38; i < 62; i+=3){
+	//	pwmWrite(servo_pin, i);
+	//	delay(35);
+	//}
+	pwmWrite(servo_pin, 55);
 	delay(300);
-	for(int i = 60; i > 38; i-=2){
+	/*for(int i = 60; i > 38; i-=2){
 		pwmWrite(servo_pin, i);
 		delay(10);
 	}
+	*/
+	lock();
+	//unlock();
 	//pwmWrite(servo_pin, 40);
 	//delay(50);
-	delay(200);
+	//delay(200);
+}
+
+void flip_cube_twice(void){
+	//for(int i = 38; i < 62; i+=3){
+	//	pwmWrite(servo_pin, i);
+	//	delay(35);
+	//}
+	pwmWrite(servo_pin, 55);
+	delay(300);
+	/*for(int i = 60; i > 38; i-=2){
+		pwmWrite(servo_pin, i);
+		delay(10);
+	}
+	*/
+	lock();
+	pwmWrite(servo_pin, 55);
+	delay(350);
+	lock();
+	//delay(100);
+	//unlock();
+	//pwmWrite(servo_pin, 40);
+	//delay(50);
+	//delay(200);
 }
 
 void pwmsetup(void){
@@ -44,17 +74,17 @@ void pwmsetup(void){
 
 void lock(){
 	pwmWrite(servo_pin, locked_angle);
-	delay(500);
+	delay(350);
 }
 
 void unlock(){
 	pwmWrite(servo_pin, released_angle);
-	delay(500);
+	delay(100);
 }
 
 void cam_pos(){
 	pwmWrite(servo_pin, 31);
-	delay(500);
+	delay(100);
 }
 
 
@@ -86,15 +116,18 @@ void releasePins(){
 
 int main(void){
 	wiringPiSetup();
-	//motorsetup();
+	motorsetup();
 	pwmsetup();
 	delay(1000);
-	cam_pos();
+	//cam_pos();
 	//lock();
 	//rotate(90, HIGH);
 	//delay(100);
-	//for(int i = 0; i < 10; i++)
-	//flip_cube();
+	for(int i = 0; i < 10; i++){
+	flip_cube_twice();
+	rotate(90, 0);
+	unlock();
+	}
 	//delay(1000);
 	//unlock();
 	delay(100);
