@@ -4,3 +4,4 @@ twophase
 *.o
 *.dll
 *.csv
+/venv
