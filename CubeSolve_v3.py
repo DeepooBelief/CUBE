@@ -56,7 +56,17 @@ def movement_y_ivt(a):
 def movement_x(a):
     print("x rotate")
     hw.flip_cube()
-    hw.delay(100)
+    a[0], a[2] = a[2], a[0]
+    a[1], a[2] = a[2], a[1]
+    a[1], a[3] = a[3], a[1]
+    
+def movement_xx(a):
+    print("x rotate")
+    print("x rotate")
+    hw.flip_cube_twice()
+    a[0], a[2] = a[2], a[0]
+    a[1], a[2] = a[2], a[1]
+    a[1], a[3] = a[3], a[1]
     a[0], a[2] = a[2], a[0]
     a[1], a[2] = a[2], a[1]
     a[1], a[3] = a[3], a[1]
@@ -155,14 +165,12 @@ except (FileNotFoundError):
     f.close()    
 
 def to_U(a):
-    movement_x(a)
-    movement_x(a)
+    movement_xx(a)
 
 
 def to_F(a):
     movement_y(a)
     movement_y(a)
-    hw.delay(100)
     movement_x(a)
 
 
@@ -172,13 +180,11 @@ def to_B(a):
 
 def to_L(a):
     movement_y(a)
-    hw.delay(100)
     movement_x(a)
 
 
 def to_R(a):
     movement_y_ivt(a)
-    hw.delay(100)
     movement_x(a)
 
 
