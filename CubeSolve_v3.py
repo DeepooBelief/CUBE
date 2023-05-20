@@ -110,7 +110,7 @@ def color_detect(frame, ptLt):
             HSV = {'H': H, 'S': S, 'V': V}
             color = ''
             if HSV['S'] < 20:
-               color = 'white'
+                color = 'white'
             else:
                 color = knn(HSV)
             if color != 'illeagal':
