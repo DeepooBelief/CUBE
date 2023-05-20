@@ -12,7 +12,7 @@ if not cap.isOpened():
 cap.set(3, 640)
 cap.set(4, 480)
 
-ptLT = (85,20)
+ptLT = (100,20)
 LineColour = {'red': (0,0,255), 'orange': (0, 127, 255), 'yellow': (0, 255, 255), 'green': (0, 255, 0), 'blue': (255, 0, 0), 'white': (255, 255, 255)}
 cube_color = [[0]*9 for i in range(6)]
 Color2Pos = {'orange': 'L', 'blue': 'F', 'green': 'B', 'red': 'R', 'yellow': 'U', 'white': 'D'}
@@ -97,7 +97,7 @@ def knn(data):
 
     return max(result, key=result.get)
 
-Sample_num = 3
+Sample_num = 4
 def color_detect(frame, ptLt):
     seperation = Length//3
     result = {'red':0, 'orange':0, 'yellow': 0, 'green': 0, 'blue': 0, 'white': 0}
@@ -110,7 +110,7 @@ def color_detect(frame, ptLt):
             HSV = {'H': H, 'S': S, 'V': V}
             color = ''
             if HSV['S'] < 20:
-                color = 'white'
+               color = 'white'
             else:
                 color = knn(HSV)
             if color != 'illeagal':
@@ -234,13 +234,7 @@ def my_function():
             color_scan = input("Please input the color: ")
         elif c == ord('s'):
             
-            ret, frame = cap.read()
-            for i in range(3):
-                for j in range(3):
-                    ptLT_Temp = (ptLT[0] + Seperation*j, ptLT[1] + Seperation*i)
-                    color = color_detect(frame, ptLT_Temp)
-                    face_color[i * 3 + j] = color
-                    cv.rectangle(frame, ptLT_Temp, ptRB_Temp, LineColour[color], 2)
+            
             SCAN_ORDER = "UFRBLD"
             #for idx in range(9):
                 #cube_color[face_idx][idx] = face_color[idx]
