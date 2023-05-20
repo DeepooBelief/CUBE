@@ -1,6 +1,8 @@
+import numpy as np
 import cv2 as cv
 import colorsys
 import csv
+import time
 from ctypes import *
 
 
@@ -12,7 +14,7 @@ if not cap.isOpened():
 cap.set(3, 640)
 cap.set(4, 480)
 
-ptLT = (100,20)
+ptLT = (85,20)
 LineColour = {'red': (0,0,255), 'orange': (0, 127, 255), 'yellow': (0, 255, 255), 'green': (0, 255, 0), 'blue': (255, 0, 0), 'white': (255, 255, 255)}
 cube_color = [[0]*9 for i in range(6)]
 Color2Pos = {'orange': 'L', 'blue': 'F', 'green': 'B', 'red': 'R', 'yellow': 'U', 'white': 'D'}
@@ -79,6 +81,59 @@ try:
 
     f.close()
     
+except (FileNotFoundError):
+    b = []
+    headers = ['Color', 'H', 'S', 'V']
+    with open('color.csv', 'a', encoding='utf-8', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(headers)
+
+    f.close()
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("Can't receive frame (stream end?). Exiting ...")
+            hw.releasePins()
+            break
+
+        drawBlocks(frame, (255, 255, 255))
+        cv.imshow('frame', frame)
+
+        c = cv.waitKey(1)
+        if c == ord('q'):
+            break
+
+        elif c == ord('c'): #'c' means capture the color info, you need to type in the color like "orange", "yellow" etc.
+            col = input()
+            for i in range(3):
+                for j in range(3):
+                    ptLT_Temp = (ptLT[0] + Seperation*j, ptLT[1] + Seperation*i)
+                    ptRB_Temp = (ptLT_Temp[0]+Length,ptLT_Temp[1]+Length)
+                    a = [0, 0, 0]
+                    for channel in range(3):
+                        a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + Length, ptLT_Temp[0] + 1: ptLT_Temp[0] + Length, channel])
+
+                    (H,S,V) = colorsys.rgb_to_hsv(a[2]/ 255, a[1]/ 255, a[0]/ 255)
+                    (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
+                    row = [col, H, S, V]
+                    print('H s v:', H,S,V)
+                    with open('color.csv', 'a', encoding='utf-8', newline='') as f:
+                        writer = csv.writer(f)
+                        writer.writerow(row)
+
+            f.close()
+        elif c == ord('w'):
+            movement_x(cube_pos)
+        elif c == ord('a'):
+            movement_y(cube_pos)
+        elif c == ord('d'):
+            movement_y_ivt(cube_pos)
+
+    hw.releasePins()
+    cap.release()
+    cv.destroyAllWindows()
+    exit()
 
 def distance(d1, d2):
     dH = int(d1['H']) - int(d2['H'])
@@ -105,7 +160,7 @@ def knn(data):
     
     res2 = res[0:K]
     
-    result = {'red':0, 'orange':0, 'yellow': 0, 'green': 0, 'blue': 0, 'white': 0, 'illeagal': 0}
+    result = {'red':0, 'orange':0, 'yellow': 0, 'green': 0, 'blue': 0, 'white': 0}
     sum = 0
     for r in res2:
         sum += r['distance']
@@ -113,64 +168,13 @@ def knn(data):
     for r in res2:
         result[r['result']] += 1 - r['distance']/(sum + 0.1)
 
-    return max(result, key=result.get)
+    max_val = max(result.values())
 
-Sample_num = 4
-def color_detect(frame, ptLt):
-    seperation = Length//3
-    result = {'red':0, 'orange':0, 'yellow': 0, 'green': 0, 'blue': 0, 'white': 0}
-    for i in range(3):
-        for j in range(3):
-            ptLT_Temp = (ptLt[0] + seperation*j, ptLt[1] + seperation*i)
-            pixel_bgr = frame[ptLT_Temp[1], ptLT_Temp[0]]
-            (H,S,V) = colorsys.rgb_to_hsv(pixel_bgr[2]/ 255, pixel_bgr[1]/ 255, pixel_bgr[0]/ 255)
-            (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
-            HSV = {'H': H, 'S': S, 'V': V}
-            color = ''
-            if HSV['S'] < 20:
-                color = 'white'
-            else:
-                color = knn(HSV)
-            if color != 'illeagal':
-                result[color] += 1
-            
-    return max(result, key=result.get)
-    
-    
-datas = []
-ret, frame = cap.read()
-color_scan = 'blue'    
-def get_hsv(event, x, y, flags, param):
-    global frame
-    if event == cv.EVENT_LBUTTONDOWN:
-        pixel_bgr = frame[y, x]
-        (H,S,V) = colorsys.rgb_to_hsv(pixel_bgr[2]/ 255, pixel_bgr[1]/ 255, pixel_bgr[0]/ 255)
-        (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
-        hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-        print("{},{},{},{}".format(color_scan, H, S, V))
-        with open('color.csv', "a") as f:
-           f.write("{},{},{},{}\r".format(color_scan, H, S, V))
-        datas.append({'Color': color_scan, 'H': H, 'S': S, 'V': V})
-    if event == cv.EVENT_RBUTTONDOWN:
-        print(color_detect(frame, (x, y)))
-        
-cv.namedWindow('frame')
-cv.setMouseCallback("frame", get_hsv)
+    for key, value in result.items():
+        if value == max_val:
+            return key
 
-try:
-    with open('color.csv', 'r') as f:
-        reader = csv.DictReader(f)
-        datas = [row for row in reader]
-    f.close()
-    
-except (FileNotFoundError):
-    b = []
-    headers = ['Color', 'H', 'S', 'V']
-    with open('color.csv', 'a', encoding='utf-8', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(headers)
 
-    f.close()    
 
 def to_U(a):
     movement_xx(a)
@@ -224,7 +228,7 @@ import twophase.solver  as sv
 
 
 def my_function():
-    global face_color, face_idx, color_scan, frame
+    global face_color, face_idx
     hw.cam_pos()
     while True:
         ret, frame = cap.read()
@@ -238,17 +242,26 @@ def my_function():
             cv.destroyAllWindows()
             hw.releasePins()
             exit()
-        elif c == ord('w'):
-            movement_x(cube_pos)
-        elif c == ord('a'):
-            movement_y(cube_pos)
-        elif c == ord('d'):
-            movement_y_ivt(cube_pos)
-        elif c == ord('c'): #'c' means capture the color info, you need to type in the color like "orange", "yellow" etc.
-            color_scan = input("Please input the color: ")
         elif c == ord('s'):
             
-            
+            ret, frame = cap.read()
+            for i in range(3):
+                for j in range(3):
+                    ptLT_Temp = (ptLT[0] + Seperation*j, ptLT[1] + Seperation*i)
+                    ptRB_Temp = (ptLT_Temp[0]+Length,ptLT_Temp[1]+Length)
+                    a = [0, 0, 0]
+                    for channel in range(3):
+                        a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + Length, ptLT_Temp[0] + 1: ptLT_Temp[0] + Length, channel])
+
+                    (H,S,V) = colorsys.rgb_to_hsv(a[2]/ 255, a[1]/ 255, a[0]/ 255)
+                    (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
+                    HSV = {'H': H, 'S': S, 'V': V}
+                    color = knn(HSV)
+                    if HSV['S'] < 20:
+                        color = 'white'
+                    
+                    face_color[i * 3 + j] = color
+                    cv.rectangle(frame, ptLT_Temp, ptRB_Temp, LineColour[color], 2)
             SCAN_ORDER = "UFRBLD"
             #for idx in range(9):
                 #cube_color[face_idx][idx] = face_color[idx]
@@ -275,7 +288,17 @@ def my_function():
             for j in range(3):
                 ptLT_Temp = (ptLT[0] + Seperation*j, ptLT[1] + Seperation*i)
                 ptRB_Temp = (ptLT_Temp[0]+Length,ptLT_Temp[1]+Length)
-                color = color_detect(frame, ptLT_Temp)
+                a = [0, 0, 0]
+                for channel in range(3):
+                    a[channel] = np.mean(frame[ptLT_Temp[1] + 1 : ptLT_Temp[1] + Length, ptLT_Temp[0] + 1: ptLT_Temp[0] + Length, channel])
+
+                (H,S,V) = colorsys.rgb_to_hsv(a[2]/ 255, a[1]/ 255, a[0]/ 255)
+                (H,S,V) = (int(H * 360), int(S * 100), int(V * 100))
+                HSV = {'H': H, 'S': S, 'V': V}
+                color = knn(HSV)
+                if HSV['S'] < 20:
+                    color = 'white'
+                
                 face_color[i * 3 + j] = color
                 cv.rectangle(frame, ptLT_Temp, ptRB_Temp, LineColour[color], 2)
 
