@@ -12,12 +12,12 @@ if not cap.isOpened():
 cap.set(3, 640)
 cap.set(4, 480)
 
-ptLT = (100,40)
+ptLT = (110,40)
 LineColour = {'red': (0,0,255), 'orange': (0, 127, 255), 'yellow': (0, 255, 255), 'green': (0, 255, 0), 'blue': (255, 0, 0), 'white': (255, 255, 255)}
 cube_color = [[0]*9 for i in range(6)]
 Color2Pos = {'orange': 'L', 'blue': 'F', 'green': 'B', 'red': 'R', 'yellow': 'U', 'white': 'D'}
 Seperation = 172 #摄像头正方形的间距
-Length = 80 #摄像头正方形的边长
+Length = 70 #摄像头正方形的边长
 
 face_color = [0]*9
 order = 'URFDLB'#'UFRBLD'
@@ -107,7 +107,7 @@ def knn(data):
 
     return max(result, key=result.get)
 
-Sample_num = 4
+Sample_num = 3
 def color_detect(frame, ptLt):
     seperation = Length//3
     result = {'red':0, 'orange':0, 'yellow': 0, 'green': 0, 'blue': 0, 'white': 0}
@@ -199,7 +199,7 @@ def manipulateCube(res):
             p[cube_pos.index(c)](cube_pos)
         elif c.isdigit():
             i = int(c)
-            hw.lock()
+            #hw.lock()
             if i == 3:
                 hw.rotate(90, True);
             else:

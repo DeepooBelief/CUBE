@@ -27,14 +27,15 @@ void flip_cube(void){
 	//	pwmWrite(servo_pin, i);
 	//	delay(35);
 	//}
-	pwmWrite(servo_pin, 55);
-	delay(300);
+	pwmWrite(servo_pin, 56);
+	delay(350);
 	/*for(int i = 60; i > 38; i-=2){
 		pwmWrite(servo_pin, i);
 		delay(10);
 	}
 	*/
 	lock();
+	delay(100);
 	//unlock();
 	//pwmWrite(servo_pin, 40);
 	//delay(50);
@@ -46,18 +47,18 @@ void flip_cube_twice(void){
 	//	pwmWrite(servo_pin, i);
 	//	delay(35);
 	//}
-	pwmWrite(servo_pin, 55);
-	delay(320);
+	pwmWrite(servo_pin, 56);
+	delay(350);
 	/*for(int i = 60; i > 38; i-=2){
 		pwmWrite(servo_pin, i);
 		delay(10);
 	}
 	*/
 	lock();
-	pwmWrite(servo_pin, 55);
+	pwmWrite(servo_pin, 56);
 	delay(350);
 	lock();
-	delay(50);
+	delay(100);
 	//delay(100);
 	//unlock();
 	//pwmWrite(servo_pin, 40);
@@ -120,12 +121,13 @@ int main(void){
 	motorsetup();
 	pwmsetup();
 	delay(1000);
+	//pwmWrite(servo_pin, 55);
 	//cam_pos();
 	//lock();
 	//rotate(90, HIGH);
 	//delay(100);
 	for(int i = 0; i < 10; i++){
-	flip_cube_twice();
+	flip_cube();
 	rotate(90, 0);
 	unlock();
 	}
