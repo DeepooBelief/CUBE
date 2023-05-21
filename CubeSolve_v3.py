@@ -12,7 +12,7 @@ if not cap.isOpened():
 cap.set(3, 640)
 cap.set(4, 480)
 
-ptLT = (100,20)
+ptLT = (100,40)
 LineColour = {'red': (0,0,255), 'orange': (0, 127, 255), 'yellow': (0, 255, 255), 'green': (0, 255, 0), 'blue': (255, 0, 0), 'white': (255, 255, 255)}
 cube_color = [[0]*9 for i in range(6)]
 Color2Pos = {'orange': 'L', 'blue': 'F', 'green': 'B', 'red': 'R', 'yellow': 'U', 'white': 'D'}

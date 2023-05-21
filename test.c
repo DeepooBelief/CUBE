@@ -17,7 +17,7 @@
 
 #define released_angle 38
 
-#define locked_angle 27
+#define locked_angle 26
 void lock();
 void unlock();
 void cam_pos();
@@ -47,7 +47,7 @@ void flip_cube_twice(void){
 	//	delay(35);
 	//}
 	pwmWrite(servo_pin, 55);
-	delay(300);
+	delay(320);
 	/*for(int i = 60; i > 38; i-=2){
 		pwmWrite(servo_pin, i);
 		delay(10);
@@ -57,6 +57,7 @@ void flip_cube_twice(void){
 	pwmWrite(servo_pin, 55);
 	delay(350);
 	lock();
+	delay(50);
 	//delay(100);
 	//unlock();
 	//pwmWrite(servo_pin, 40);
@@ -74,7 +75,7 @@ void pwmsetup(void){
 
 void lock(){
 	pwmWrite(servo_pin, locked_angle);
-	delay(350);
+	delay(250);
 }
 
 void unlock(){
@@ -83,7 +84,7 @@ void unlock(){
 }
 
 void cam_pos(){
-	pwmWrite(servo_pin, 31);
+	pwmWrite(servo_pin, 32);
 	delay(100);
 }
 
